@@ -1,14 +1,10 @@
 --Schema for CSC343h Phase 2
 --to initialize this database, use the following command in dbsrv1:
 --Note: owid-covid-data must also be present in the same directory
---psql csc343h-<utorid> -f 'schema.sql'
+--psql csc343h-<utorid> -f 'work.sql'
 
 
-/*
-To do:
-We'll need to dig into the data more deeply to decide 
-the use of NOT NULL constrain
-*/
+
 
 
 /*------------------------Schema------------------------*/
@@ -16,14 +12,14 @@ DROP SCHEMA IF EXISTS COVID19 CASCADE;
 CREATE SCHEMA COVID19;
 SET SEARCH_PATH TO COVID19; /*Name of searchpath*/
 	
---Complete
+
 CREATE TABLE Continent (
 	continentName TEXT,
 	countryName TEXT NOT NULL UNIQUE, --Unique Needed for setting foreign key
 	PRIMARY KEY (continentName, countryName)
 );
 
---Complete
+
 --BIGINT: Some continent / world data have population greater than 2.1 billion (range of int)
 --But this table only includes countries, use BIGINT is only for futureproof
 CREATE TABLE Country (
@@ -35,7 +31,7 @@ CREATE TABLE Country (
 	FOREIGN KEY (countryName) REFERENCES Continent(countryName)
 );
 
---Complete
+
 --As many data may be missing, the NOT NULL constrain is not used here
 --BIGINT: some value can easily exceed 2.1 billion
 CREATE TABLE CoronaData (
@@ -44,16 +40,16 @@ CREATE TABLE CoronaData (
 	total_cases BIGINT,
 	total_deaths BIGINT,
 	reproduction_rate FLOAT,
-	total_tests BIGINT ,
+	total_tests BIGINT,
 	total_vaccinations BIGINT,
-	people_vaccinated BIGINT ,
-	people_fully_vaccinated BIGINT ,
-	stringency_index FLOAT ,
+	people_vaccinated BIGINT,
+	people_fully_vaccinated BIGINT,
+	stringency_index FLOAT,
 	PRIMARY KEY (iso_code,d),
 	FOREIGN KEY (iso_code) REFERENCES Country(iso_code)
 );
 
---Complete
+
 CREATE TABLE MedicalInfo (
 	iso_code VARCHAR(8),
 	cardiovasc_death_rate FLOAT,
@@ -67,7 +63,7 @@ CREATE TABLE MedicalInfo (
 	FOREIGN KEY (iso_code) REFERENCES Country(iso_code) --Country table is more appropiate
 );
 
---Complete
+
 CREATE TABLE DemographicInfo (
 	iso_code VARCHAR(8),
 	population_density FLOAT,
@@ -83,7 +79,9 @@ CREATE TABLE DemographicInfo (
 
 
 
-
+/*----------------------Load Data-----------------------*/
+--Note: all numeric in original CSV file is float, even though decimal numbers 
+--are impossible to present in such data, like number of total cases, population etc.
 CREATE TABLE  owid_covid_data(
 	iso_code VARCHAR(8),
 	continent TEXT,
@@ -153,16 +151,15 @@ CREATE TABLE  owid_covid_data(
 );
 
 --important: copy is not a SQL command and must cp in single line to the command window
-
 \COPY owid_covid_data (iso_code,continent,location,d,total_cases,new_cases,new_cases_smoothed,total_deaths,new_deaths,new_deaths_smoothed,total_cases_per_million,new_cases_per_million,new_cases_smoothed_per_million,total_deaths_per_million,new_deaths_per_million,new_deaths_smoothed_per_million,reproduction_rate,icu_patients,icu_patients_per_million,hosp_patients,hosp_patients_per_million,weekly_icu_admissions,weekly_icu_admissions_per_million,weekly_hosp_admissions,weekly_hosp_admissions_per_million,new_tests,total_tests,total_tests_per_thousand,new_tests_per_thousand,new_tests_smoothed,new_tests_smoothed_per_thousand,positive_rate,tests_per_case,tests_units,total_vaccinations,people_vaccinated,people_fully_vaccinated,total_boosters,new_vaccinations,new_vaccinations_smoothed,total_vaccinations_per_hundred,people_vaccinated_per_hundred,people_fully_vaccinated_per_hundred,total_boosters_per_hundred,new_vaccinations_smoothed_per_million,stringency_index,population,population_density,median_age,aged_65_older,aged_70_older,gdp_per_capita,extreme_poverty,cardiovasc_death_rate,diabetes_prevalence,female_smokers,male_smokers,handwashing_facilities,hospital_beds_per_thousand,life_expectancy,human_development_index,excess_mortality_cumulative_absolute,excess_mortality_cumulative,excess_mortality,excess_mortality_cumulative_per_million)from 'owid-covid-data.csv'DELIMITER ',' CSV HEADER
 
 
---Continent
+--Continent Load data
 insert into Continent (continentName, countryName)
 select distinct continent as continentName, location as countryName 
 from owid_covid_data where continent is not NULL;
 
-/* --The following group data is not included and can be access as
+/* --The following continent, EU, World data is not included and can be access as
 select distinct continent as continentName, location as countryName 
 from owid_covid_data where continent is NULL
 ORDER BY countryName;*/
@@ -171,7 +168,7 @@ select distinct iso_code, continent, location
 from owid_covid_data where length(iso_code)>3
 ORDER BY LOCATION;*/
 
---Country
+--Country Load data
 insert into Country(iso_code, countryName, population, gdp_per_capita)
 select distinct iso_code, 
 	location as countryName, 
@@ -179,7 +176,7 @@ select distinct iso_code,
 	gdp_per_capita
 	from owid_covid_data where continent is not NULL;
 
---CoronaData
+--CoronaData Load data
 insert into CoronaData(
 	iso_code, d, total_cases, total_deaths, reproduction_rate, total_tests,
 	total_vaccinations,people_vaccinated, people_fully_vaccinated, stringency_index)
@@ -198,7 +195,8 @@ from owid_covid_data where continent is not NULL;
 
 
 --MedicalInfo
---The insertion is successful, therefore the following data were never updated by OWID
+--The insertion is successful and satisfying all key constrains, 
+--therefore the following data were never updated by OWID
 --In another word, they're not associated with d(date)
 insert into MedicalInfo (
 	iso_code,
@@ -219,3 +217,4 @@ Select distinct
 	male_smokers,
 	handwashing_facilities 
 from owid_covid_data where continent is not NULL;
+/*---------------------Load Data END--------------------*/
