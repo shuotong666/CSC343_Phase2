@@ -278,6 +278,7 @@ Drop table owid_covid_data;
 /*-------------------------Demo-------------------------*/
 /*
 In the terminal, type:
+cd ~/CSC343_Phase2
 psql csc343h-lishuoto -f 'schema.ddl'
 psql csc343h-lishuoto -f 'load_data.sql'
 psql csc343h-lishuoto
