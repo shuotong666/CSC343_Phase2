@@ -262,19 +262,14 @@ Select distinct
 from owid_covid_data where continent is not NULL;
 /*---------------------Load Data END--------------------*/
 
-/*--------------------------Demo------------------------*/
-
-select distinct location, excess_mortality from owid_covid_data where Continent='North America';
-select distinct location, excess_mortality_cumulative_absolute from owid_covid_data where Continent='North America';
-select distinct location, excess_mortality_cumulative from owid_covid_data where Continent='North America';
-select distinct location, excess_mortality_cumulative _per_million from owid_covid_data where Continent='North America';
-
-select distinct location from owid_covid_data where Continent='North America';
-
-
-
-
-
+/*-------------------------Demo-------------------------*/
+/*
+select * from Country limit 10;
+select * from CoronaData where iso_code='CAN' and d between '2021-03-01' and '2021-03-07';
+select * from MedicalInfo limit 10;
+select * from DemographicInfo limit 10;
+*/
+/*-----------------------Demo END-----------------------*/
 
 
 
