@@ -283,7 +283,7 @@ psql csc343h-lishuoto -f 'schema.ddl'
 psql csc343h-lishuoto -f 'load_data.sql'
 psql csc343h-lishuoto
 Then in the psql, use the following query to select a few lines from the database.
-Set SEARCH_PATH to COVID19
+Set SEARCH_PATH to COVID19;
 select * from Country limit 10;
 select * from CoronaData where iso_code='CAN' and d between '2021-03-01' and '2021-03-07';
 select * from MedicalInfo limit 10;

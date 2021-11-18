@@ -1,0 +1,104 @@
+Last login: Wed Nov 17 21:37:28 on ttys001
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+(base) Shuotongs-MacBook:~ Li$ ssh lishuoto@dbsrv1.teach.cs.toronto.edu
+lishuoto@dbsrv1.teach.cs.toronto.edu's password: 
+
+    Type "faq" to view FAQ, and "rules" to view usage policy.
+    Report system problems by sending email to <sysadmin@teach.cs.toronto.edu>.
+
+The Teaching Labs are: BA2200 BA2210 BA2220 BA2240 BA2270 BA3175 BA3185 BA3195 BA3200
+
+FALL 2021 Teaching Labs updates available https://www.teach.cs.toronto.edu/fall2021
+
+This is a shared Linux system. By using this system, you acknowledge that
+some information about your computer account (e.g. login name, process data,
+etc.) will be available to other users sharing this system, in ways 
+typical of shared Linux systems.  
+
+Last login: Wed Nov 17 21:37:37 2021 from 72.137.189.98
+dbsrv1:~$ cd ~/CSC343_Phase2
+dbsrv1:~/CSC343_Phase2$ psql csc343h-lishuoto -f 'schema.ddl'
+psql:schema.ddl:8: NOTICE:  schema "covid19" does not exist, skipping
+DROP SCHEMA
+CREATE SCHEMA
+SET
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+dbsrv1:~/CSC343_Phase2$ psql csc343h-lishuoto -f 'load_data.sql'
+SET
+CREATE TABLE
+COPY 119672
+INSERT 0 224
+INSERT 0 114211
+INSERT 0 224
+INSERT 0 224
+DROP TABLE
+dbsrv1:~/CSC343_Phase2$ psql csc343h-lishuoto
+psql (10.19 (Ubuntu 10.19-0ubuntu0.18.04.1), server 10.18 (Ubuntu 10.18-0ubuntu0.18.04.1))
+Type "help" for help.
+
+csc343h-lishuoto=> Set SEARCH_PATH to COVID19
+csc343h-lishuoto-> ;
+SET
+csc343h-lishuoto=> select * from Country limit 10;
+ iso_code |    countryname     | continentname | population | gdp_per_capita 
+----------+--------------------+---------------+------------+----------------
+ DOM      | Dominican Republic | North America |   10953714 |      14600.861
+ ETH      | Ethiopia           | Africa        |  117876226 |       1729.927
+ USA      | United States      | North America |  332915074 |      54225.446
+ ROU      | Romania            | Europe        |   19127772 |      23313.199
+ SVN      | Slovenia           | Europe        |    2078723 |       31400.84
+ SWZ      | Eswatini           | Africa        |    1172369 |       7738.975
+ FRA      | France             | Europe        |   67564251 |      38605.671
+ MMR      | Myanmar            | Asia          |   54806014 |       5591.597
+ PNG      | Papua New Guinea   | Oceania       |    9119005 |       3823.194
+ BGR      | Bulgaria           | Europe        |    6896655 |      18563.307
+(10 rows)
+
+csc343h-lishuoto=> select * from CoronaData where iso_code='CAN' and d between '2021-03-01' and '2021-03-07';
+ iso_code |     d      | total_cases | total_deaths | reproduction_rate | total_tests | total_vaccinations | people_vaccinated | people_fully_vaccinated | stringency_index 
+----------+------------+-------------+--------------+-------------------+-------------+--------------------+-------------------+-------------------------+------------------
+ CAN      | 2021-03-01 |      874909 |        22018 |              0.98 |    24545470 |            1946200 |           1407961 |                  538239 |            75.46
+ CAN      | 2021-03-02 |      877747 |        22046 |              0.98 |    24621134 |            2018238 |           1470034 |                  548204 |            75.46
+ CAN      | 2021-03-03 |      880487 |        22106 |              0.99 |    24698266 |            2091700 |           1537273 |                  554427 |            75.46
+ CAN      | 2021-03-04 |      883619 |        22152 |                 1 |    24813290 |            2169417 |           1610535 |                  558882 |            75.46
+ CAN      | 2021-03-05 |      886492 |        22193 |              1.01 |    24939113 |            2255174 |           1693203 |                  561971 |            75.46
+ CAN      | 2021-03-06 |      889255 |        22214 |              1.02 |    25067769 |            2329622 |           1765405 |                  564217 |            75.46
+ CAN      | 2021-03-07 |      891807 |        22240 |              1.03 |    25180543 |            2387189 |           1821470 |                  565719 |            75.46
+(7 rows)
+
+csc343h-lishuoto=> select * from MedicalInfo limit 10;
+ iso_code | cardiovasc_death_rate | diabetes_prevalence | hospital_beds_per_thousand | life_expectancy | female_smokers | male_smokers | handwashing_facilities 
+----------+-----------------------+---------------------+----------------------------+-----------------+----------------+--------------+------------------------
+ BFA      |               269.048 |                2.42 |                        0.4 |           61.58 |            1.6 |         23.9 |                 11.877
+ TTO      |               228.467 |               10.97 |                          3 |           73.51 |                |              |                 89.443
+ JAM      |               206.537 |               11.28 |                        1.7 |           74.47 |            5.3 |         28.6 |                 66.425
+ SDN      |               431.388 |               15.67 |                        0.8 |           65.31 |                |              |                 23.437
+ TON      |                227.49 |               15.42 |                        2.6 |           70.91 |           11.8 |         44.4 |                       
+ WSM      |               348.977 |                9.21 |                            |           73.32 |           16.7 |         38.1 |                       
+ FLK      |                       |                     |                            |           81.44 |                |              |                       
+ DJI      |               258.037 |                6.05 |                        1.4 |           67.11 |            1.7 |         24.5 |                       
+ VEN      |                204.85 |                6.47 |                        0.8 |           72.06 |                |              |                       
+ DOM      |               266.653 |                 8.2 |                        1.6 |           74.08 |            8.5 |         19.1 |                 55.182
+(10 rows)
+
+csc343h-lishuoto=> select * from DemographicInfo limit 10;
+ iso_code | population_density | median_age | aged_65_older | aged_70_older | mortality_rate | human_development_index 
+----------+--------------------+------------+---------------+---------------+----------------+-------------------------
+ PYF      |             77.324 |       32.7 |         7.775 |         4.593 |                |                        
+ NOR      |             14.462 |       39.7 |        16.821 |        10.813 |                |                   0.957
+ LSO      |             73.562 |       22.2 |         4.506 |         2.647 |                |                   0.527
+ SOM      |               23.5 |       16.8 |         2.731 |         1.496 |                |                        
+ MNE      |              46.28 |       39.1 |        14.762 |         9.395 |                |                   0.829
+ PCN      |                    |            |               |               |                |                        
+ MCO      |            19347.5 |            |               |               |                |                        
+ DMA      |             98.567 |            |               |               |                |                   0.742
+ POL      |            124.027 |       41.8 |        16.763 |        10.202 |                |                    0.88
+ ARG      |             16.177 |       31.9 |        11.198 |         7.441 |                |                   0.845
+(10 rows)
+
