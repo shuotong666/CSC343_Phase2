@@ -93,8 +93,8 @@ CREATE TABLE DemographicInfo (
 	iso_code VARCHAR(8),
 	population_density FLOAT,
 	median_age FLOAT,
-	aged_65_old FLOAT,
-	aged_70_old FLOAT,
+	aged_65_older FLOAT,
+	aged_70_older FLOAT,
 	mortality_rate FLOAT,
 	human_development_index FLOAT,
 	PRIMARY KEY (iso_code),
@@ -243,12 +243,33 @@ Select distinct
 	male_smokers,
 	handwashing_facilities 
 from owid_covid_data where continent is not NULL;
+
+insert into DemographicInfo (
+	iso_code,
+	population_density,
+	median_age,
+	aged_65_older,
+	aged_70_older,
+	human_development_index
+)
+Select distinct 	
+	iso_code,
+	population_density,
+	median_age,
+	aged_65_older,
+	aged_70_older,
+	human_development_index
+from owid_covid_data where continent is not NULL;
 /*---------------------Load Data END--------------------*/
 
 /*--------------------------Demo------------------------*/
 
+select distinct location, excess_mortality from owid_covid_data where Continent='North America';
+select distinct location, excess_mortality_cumulative_absolute from owid_covid_data where Continent='North America';
+select distinct location, excess_mortality_cumulative from owid_covid_data where Continent='North America';
+select distinct location, excess_mortality_cumulative _per_million from owid_covid_data where Continent='North America';
 
-
+select distinct location from owid_covid_data where Continent='North America';
 
 
 
