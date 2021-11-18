@@ -83,7 +83,7 @@ CREATE TABLE MedicalInfo (
 	FOREIGN KEY (iso_code) REFERENCES Country(iso_code) 
 );
 
-/*Relation MedicalInfo
+/*Relation DemographicInfo
 This relation reports the demographic info of a certain country 
 and they are not time sensitive from the original CSV file.
 For the same reasons, due to lack of availability of data inputs, 
@@ -202,6 +202,7 @@ select distinct iso_code,
 	gdp_per_capita
 	from owid_covid_data where continent is not NULL;
 
+
 --CoronaData Load data
 insert into CoronaData(
 	iso_code, d, total_cases, total_deaths, reproduction_rate, total_tests,
@@ -220,7 +221,7 @@ select
 from owid_covid_data where continent is not NULL;
 
 
---MedicalInfo
+--MedicalInfo Load Data
 --The insertion is successful and satisfying all key constrains, 
 --therefore the following data were never updated by OWID
 --In another word, they're not associated with d(date)
@@ -244,6 +245,8 @@ Select distinct
 	handwashing_facilities 
 from owid_covid_data where continent is not NULL;
 
+
+--DemographicInfo Load Data
 insert into DemographicInfo (
 	iso_code,
 	population_density,
@@ -260,10 +263,26 @@ Select distinct
 	aged_70_older,
 	human_development_index
 from owid_covid_data where continent is not NULL;
+
+
+--After processing the data, we can drop this table as it is no longer required anymore
+Drop table owid_covid_data;
+
 /*---------------------Load Data END--------------------*/
 
+/*Export Tables*/
+\copy (select * from country) to 'Country.csv' with csv Header
+\copy (select * from CoronaData where iso_code='CAN') to 'CoronaData.csv' with csv Header
+\copy (select * from MedicalInfo) to 'MedicalInfo.csv' with csv Header
+\copy (select * from DemographicInfo) to 'DemographicInfo.csv' with csv Header
 /*-------------------------Demo-------------------------*/
 /*
+In the terminal, type:
+psql csc343h-lishuoto -f 'schema.ddl'
+psql csc343h-lishuoto -f 'load_data.sql'
+psql csc343h-lishuoto
+Then in the psql, use the following query to select a few lines from the database.
+Set SEARCH_PATH to COVID19
 select * from Country limit 10;
 select * from CoronaData where iso_code='CAN' and d between '2021-03-01' and '2021-03-07';
 select * from MedicalInfo limit 10;
