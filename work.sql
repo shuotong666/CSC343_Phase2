@@ -36,8 +36,8 @@ CREATE TABLE Country (
 	iso_code VARCHAR(8), --Some region have OWID_ prefix
 	countryName TEXT NOT NULL, 
 	continentName TEXT NOT NULL,
-	population BIGINT, 
-	gdp_per_capita FLOAT,
+	population BIGINT NOT NULL, 
+	gdp_per_capita FLOAT NOT NULL,
 	PRIMARY KEY(iso_code)
 );
 
@@ -50,16 +50,31 @@ As many data may be missing due to lack of such report or unable to update on a 
 NOT NULL constrain is difficult to enforce here without giving up datas from developing countries.
 */
 CREATE TABLE CoronaData (
-	iso_code VARCHAR(8),
-	d DATE, --cannot use 'date' as this is a keyword in sql
-	total_cases BIGINT,
+	iso_code VARCHAR(8) NOT NULL,
+	d DATE NOT NULL, --cannot use 'date' as this is a keyword in sql
+	total_cases BIGINT NOT NULL,
 	total_deaths BIGINT,
 	reproduction_rate FLOAT,
 	total_tests BIGINT,
-	total_vaccinations BIGINT,
-	people_vaccinated BIGINT,
-	people_fully_vaccinated BIGINT,
 	stringency_index FLOAT,
+	PRIMARY KEY (iso_code,d),
+	FOREIGN KEY (iso_code) REFERENCES Country(iso_code)
+);
+
+/*Relation CoronaData
+This relation reports daily data of COVID-19 vaccincation for a given country by ISO code and date.
+For optimization purposes, the derived data from the original CSV file is not included, 
+for example, new cases over a certain amount of time (per day, week, month) 
+can be calculated by comparing the total cases of two given time.
+As many data may be missing due to lack of such report or unable to update on a daily basis,
+NOT NULL constrain is difficult to enforce here without giving up datas from developing countries.
+*/
+CREATE TABLE Vaccinations (
+	iso_code VARCHAR(8) NOT NULL,
+	d DATE NOT NULL, --cannot use 'date' as this is a keyword in sql
+	total_vaccinations BIGINT NOT NULL,
+	people_vaccinated BIGINT NOT NULL,
+	people_fully_vaccinated BIGINT NOT NULL,
 	PRIMARY KEY (iso_code,d),
 	FOREIGN KEY (iso_code) REFERENCES Country(iso_code)
 );
@@ -200,13 +215,12 @@ select distinct iso_code,
 	continent as continentName,
 	cast(population as BIGINT),
 	gdp_per_capita
-	from owid_covid_data where continent is not NULL;
+	from owid_covid_data where continent is not NULL and population is not NULL and gdp_per_capita is not NULL;
 
 
 --CoronaData Load data
 insert into CoronaData(
-	iso_code, d, total_cases, total_deaths, reproduction_rate, total_tests,
-	total_vaccinations,people_vaccinated, people_fully_vaccinated, stringency_index)
+	iso_code, d, total_cases, total_deaths, reproduction_rate, total_tests, stringency_index)
 select 
 	iso_code, 
 	d, 
@@ -214,12 +228,19 @@ select
 	cast(total_deaths as BIGINT), 
 	reproduction_rate, 
 	cast(total_tests as BIGINT), 
+	stringency_index
+from owid_covid_data where continent is not NULL and total_cases is not NULL and population is not NULL and gdp_per_capita is not NULL;
+
+-- vaccination
+insert into Vaccinations (
+	iso_code, d, total_vaccinations,people_vaccinated, people_fully_vaccinated)
+select 
+	iso_code, 
+	d, 
 	cast(total_vaccinations as BIGINT), 
 	cast(people_vaccinated as BIGINT), 
-	cast(people_fully_vaccinated as BIGINT), 
-	stringency_index
-from owid_covid_data where continent is not NULL;
-
+	cast(people_fully_vaccinated as BIGINT)
+from owid_covid_data where continent is not NULL and total_vaccinations is not NULL and people_fully_vaccinated is not NULL and people_vaccinated is not NULL and population is not NULL and gdp_per_capita is not NULL;
 
 --MedicalInfo Load Data
 --The insertion is successful and satisfying all key constrains, 
@@ -243,7 +264,7 @@ Select distinct
 	female_smokers,
 	male_smokers,
 	handwashing_facilities 
-from owid_covid_data where continent is not NULL;
+from owid_covid_data where continent is not NULL and population is not NULL and gdp_per_capita is not NULL;
 
 
 --DemographicInfo Load Data
@@ -262,7 +283,7 @@ Select distinct
 	aged_65_older,
 	aged_70_older,
 	human_development_index
-from owid_covid_data where continent is not NULL;
+from owid_covid_data where continent is not NULL and population is not NULL and gdp_per_capita is not NULL;
 
 
 --After processing the data, we can drop this table as it is no longer required anymore
@@ -275,6 +296,7 @@ Drop table owid_covid_data;
 \copy (select * from CoronaData where iso_code='CAN') to 'CoronaData.csv' with csv Header
 \copy (select * from MedicalInfo) to 'MedicalInfo.csv' with csv Header
 \copy (select * from DemographicInfo) to 'DemographicInfo.csv' with csv Header
+\copy (select * from Vaccinations) to 'Vaccinations.csv' with csv Header
 /*-------------------------Demo-------------------------*/
 /*
 In the terminal, type:
