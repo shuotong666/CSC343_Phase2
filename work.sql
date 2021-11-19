@@ -12,18 +12,7 @@ DROP SCHEMA IF EXISTS COVID19 CASCADE;
 CREATE SCHEMA COVID19;
 SET SEARCH_PATH TO COVID19; /*Name of searchpath*/
 	
-/*Relation Continent
-data from OWID-COVID-data.csv contains covid data for entire continents, EU, and world
-and in such case, the location has a name but the continent is null, we'll be using this
-relation to enforce our database only contains country data.
-*/
-/*
-CREATE TABLE Continent (
-	continentName TEXT,
-	countryName TEXT NOT NULL UNIQUE, --Unique Needed for setting foreign key
-	PRIMARY KEY (continentName, countryName)
-);
-*/
+
 /*Relation Country
 This relation contrains the basic information for each country. Including:
 ISO_Code, which is the foreign key for other relations
@@ -61,7 +50,7 @@ CREATE TABLE CoronaData (
 	FOREIGN KEY (iso_code) REFERENCES Country(iso_code)
 );
 
-/*Relation CoronaData
+/*Relation Vaccinations
 This relation reports daily data of COVID-19 vaccincation for a given country by ISO code and date.
 For optimization purposes, the derived data from the original CSV file is not included, 
 for example, new cases over a certain amount of time (per day, week, month) 

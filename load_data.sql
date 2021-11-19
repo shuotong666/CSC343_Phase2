@@ -1,6 +1,5 @@
 --Note: all numeric in original CSV file is float, even though decimal numbers 
 --are impossible to present in such data, like number of total cases, population etc.
-Set Search_Path to COVID19;
 CREATE TABLE  owid_covid_data(
 	iso_code VARCHAR(8),
 	continent TEXT,
@@ -72,20 +71,7 @@ CREATE TABLE  owid_covid_data(
 --important: copy is not a SQL command and must cp in single line to the command window
 \COPY owid_covid_data (iso_code,continent,location,d,total_cases,new_cases,new_cases_smoothed,total_deaths,new_deaths,new_deaths_smoothed,total_cases_per_million,new_cases_per_million,new_cases_smoothed_per_million,total_deaths_per_million,new_deaths_per_million,new_deaths_smoothed_per_million,reproduction_rate,icu_patients,icu_patients_per_million,hosp_patients,hosp_patients_per_million,weekly_icu_admissions,weekly_icu_admissions_per_million,weekly_hosp_admissions,weekly_hosp_admissions_per_million,new_tests,total_tests,total_tests_per_thousand,new_tests_per_thousand,new_tests_smoothed,new_tests_smoothed_per_thousand,positive_rate,tests_per_case,tests_units,total_vaccinations,people_vaccinated,people_fully_vaccinated,total_boosters,new_vaccinations,new_vaccinations_smoothed,total_vaccinations_per_hundred,people_vaccinated_per_hundred,people_fully_vaccinated_per_hundred,total_boosters_per_hundred,new_vaccinations_smoothed_per_million,stringency_index,population,population_density,median_age,aged_65_older,aged_70_older,gdp_per_capita,extreme_poverty,cardiovasc_death_rate,diabetes_prevalence,female_smokers,male_smokers,handwashing_facilities,hospital_beds_per_thousand,life_expectancy,human_development_index,excess_mortality_cumulative_absolute,excess_mortality_cumulative,excess_mortality,excess_mortality_cumulative_per_million)from 'owid-covid-data.csv'DELIMITER ',' CSV HEADER
 
-/*
---Continent Load data
-insert into Continent (continentName, countryName)
-select distinct continent as continentName, location as countryName 
-from owid_covid_data where continent is not NULL;
-*/
-/* --The following continent, EU, World data is not included and can be access as
-select distinct continent as continentName, location as countryName 
-from owid_covid_data where continent is NULL
-ORDER BY countryName;*/
-/*Some location have ISO_CODE length greater than 3, access as 
-select distinct iso_code, continent, location 
-from owid_covid_data where length(iso_code)>3
-ORDER BY LOCATION;*/
+
 
 --Country Load data
 insert into Country(iso_code, countryName, continentName, population, gdp_per_capita)
@@ -94,13 +80,12 @@ select distinct iso_code,
 	continent as continentName,
 	cast(population as BIGINT),
 	gdp_per_capita
-	from owid_covid_data where continent is not NULL;
+	from owid_covid_data where continent is not NULL and population is not NULL and gdp_per_capita is not NULL;
 
 
 --CoronaData Load data
 insert into CoronaData(
-	iso_code, d, total_cases, total_deaths, reproduction_rate, total_tests,
-	total_vaccinations,people_vaccinated, people_fully_vaccinated, stringency_index)
+	iso_code, d, total_cases, total_deaths, reproduction_rate, total_tests, stringency_index)
 select 
 	iso_code, 
 	d, 
@@ -108,12 +93,19 @@ select
 	cast(total_deaths as BIGINT), 
 	reproduction_rate, 
 	cast(total_tests as BIGINT), 
+	stringency_index
+from owid_covid_data where continent is not NULL and total_cases is not NULL and population is not NULL and gdp_per_capita is not NULL;
+
+-- vaccination
+insert into Vaccinations (
+	iso_code, d, total_vaccinations,people_vaccinated, people_fully_vaccinated)
+select 
+	iso_code, 
+	d, 
 	cast(total_vaccinations as BIGINT), 
 	cast(people_vaccinated as BIGINT), 
-	cast(people_fully_vaccinated as BIGINT), 
-	stringency_index
-from owid_covid_data where continent is not NULL;
-
+	cast(people_fully_vaccinated as BIGINT)
+from owid_covid_data where continent is not NULL and total_vaccinations is not NULL and people_fully_vaccinated is not NULL and people_vaccinated is not NULL and population is not NULL and gdp_per_capita is not NULL;
 
 --MedicalInfo Load Data
 --The insertion is successful and satisfying all key constrains, 
@@ -137,7 +129,7 @@ Select distinct
 	female_smokers,
 	male_smokers,
 	handwashing_facilities 
-from owid_covid_data where continent is not NULL;
+from owid_covid_data where continent is not NULL and population is not NULL and gdp_per_capita is not NULL;
 
 
 --DemographicInfo Load Data
@@ -156,7 +148,7 @@ Select distinct
 	aged_65_older,
 	aged_70_older,
 	human_development_index
-from owid_covid_data where continent is not NULL;
+from owid_covid_data where continent is not NULL and population is not NULL and gdp_per_capita is not NULL;
 
 
 --After processing the data, we can drop this table as it is no longer required anymore
