@@ -1,5 +1,6 @@
 --Note: all numeric in original CSV file is float, even though decimal numbers 
 --are impossible to present in such data, like number of total cases, population etc.
+SET Search_path to COVID19;
 CREATE TABLE  owid_covid_data(
 	iso_code VARCHAR(8),
 	continent TEXT,
