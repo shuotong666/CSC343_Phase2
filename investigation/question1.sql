@@ -1,4 +1,5 @@
 -- Does the rising number of the vaccinated population affect the number of COVID-19 cases and the case fatality rate? 
+-- (The case fatality rate refers to the number of diagnosed cases over the number of deaths)
 
 SET SEARCH_PATH TO covid19;
 DROP TABLE IF exists beforeVaccination CASCADE;
