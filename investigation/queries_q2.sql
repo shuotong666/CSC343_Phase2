@@ -24,8 +24,7 @@ CREATE TABLE demographicVScorona(
 DROP VIEW IF EXISTS deathrate CASCADE;
 DROP VIEW IF EXISTS diagnoserate CASCADE;
 DROP VIEW IF EXISTS finalFatalityRate CASCADE;
--- DROP VIEW IF EXISTS xx CASCADE;
--- DROP VIEW IF EXISTS xx CASCADE;
+
 
 
 -- Compute total death rate
@@ -45,6 +44,7 @@ CREATE VIEW finalFatalityRate AS
     SELECT DISTINCT iso_code, (cast((max(total_deaths) OVER (PARTITION BY iso_code)) as decimal) / max(total_cases) OVER (PARTITION BY iso_code)) as fatality_rate
     FROM CoronaDataPerMonth;
 
+
 insert into demographicVScorona
     SELECT DISTINCT c.iso_code, c.countryName, c.gdp_per_capita, c.population, deR.deaths_rate, 
         diaR.diagnosed_rate, fr.fatality_rate, demo.human_development_index, demo.aged_65_older, demo.population_density
@@ -53,4 +53,5 @@ insert into demographicVScorona
         and deR.iso_code = diaR.iso_code and deR.iso_code = fr.iso_code and deR.iso_code = demo.iso_code and diaR.iso_code = fr.iso_code
         and diaR.iso_code = demo.iso_code and fr.iso_code = demo.iso_code;
 
+--Export queries result into CSV for further analysis
 \copy (select * from demographicVScorona) to 'demographicVScorona.csv' with csv Header

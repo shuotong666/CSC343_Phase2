@@ -27,8 +27,6 @@ DROP VIEW IF EXISTS CoronaDataMonthly CASCADE;
 DROP VIEW IF EXISTS vaccineStart CASCADE;
 DROP VIEW IF EXISTS beforeVaccine CASCADE;
 DROP VIEW IF EXISTS afterVaccine CASCADE;
--- DROP VIEW IF EXISTS afterVaccineFata CASCADE;
--- DROP VIEW IF EXISTS beforeVaccineFata CASCADE;
 DROP VIEW IF EXISTS fatalityRate CASCADE;
 
 -- Since we only care about the monthly average create a view with the date information striped down
@@ -50,7 +48,6 @@ CREATE VIEW vaccineStart AS
 
 -- use the vaccination start date as a piviot point and generate the total covid cases
 -- for each country before the vaccine distribution
-
 CREATE VIEW beforeVaccine AS
     SELECT DISTINCT c.iso_code, c.months, c.total_cases, c.total_deaths
     FROM CoronaDataPerMonth c, vaccineStart v
@@ -69,16 +66,8 @@ CREATE VIEW fatalityRate AS
     FROM CoronaDataPerMonth
     ORDER BY iso_code, months;
 
--- CREATE VIEW afterVaccineFata AS
---     SELECT DISTINCT iso_code, months, cast(total_deaths as decimal)/total_cases as fatality_rate
---     FROM afterVaccine
---     ORDER BY iso_code, months;
 
--- CREATE VIEW beforeVaccineFata AS
---     SELECT DISTINCT iso_code, months, cast(total_deaths as decimal)/total_cases as fatality_rate
---     FROM beforeVaccine
---     ORDER BY iso_code, months;
-
+--Use the view above to synthese the results
 insert into beforeVaccination
     SELECT c.iso_code, c.countryName, b.months, b.total_cases, b.total_deaths, bf.fatality_rate
     FROM country c, beforeVaccine b, fatalityRate bf
@@ -89,10 +78,7 @@ insert into afterVaccination
     FROM country c, afterVaccine a, fatalityRate af
     WHERE c.iso_code = a.iso_code and c.iso_code = af.iso_code and a.iso_code = af.iso_code and a.months = af.months;
 
--- follow up 
--- first shot / population rate and the effect on the 
--- vaccinated / population and effect
--- fully / population and effect on fatality rate
 
+--Export queries result into CSV for further analysis
 \copy (select * from beforeVaccination) to 'beforeVaccination.csv' with csv Header
 \copy (select * from afterVaccination) to 'afterVaccination.csv' with csv Header
