@@ -52,3 +52,5 @@ insert into demographicVScorona
     WHERE c.iso_code = deR.iso_code and c.iso_code = diaR.iso_code and c.iso_code = fr.iso_code and c.iso_code = demo.iso_code
         and deR.iso_code = diaR.iso_code and deR.iso_code = fr.iso_code and deR.iso_code = demo.iso_code and diaR.iso_code = fr.iso_code
         and diaR.iso_code = demo.iso_code and fr.iso_code = demo.iso_code;
+
+\copy (select * from demographicVScorona) to 'demographicVScorona.csv' with csv Header

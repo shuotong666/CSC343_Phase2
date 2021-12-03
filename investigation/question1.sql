@@ -93,3 +93,6 @@ insert into afterVaccination
 -- first shot / population rate and the effect on the 
 -- vaccinated / population and effect
 -- fully / population and effect on fatality rate
+
+\copy (select * from beforeVaccination) to 'beforeVaccination.csv' with csv Header
+\copy (select * from afterVaccination) to 'afterVaccination.csv' with csv Header
