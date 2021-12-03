@@ -27,13 +27,20 @@ DROP VIEW IF EXISTS CoronaDataMonthly CASCADE;
 DROP VIEW IF EXISTS vaccineStart CASCADE;
 DROP VIEW IF EXISTS beforeVaccine CASCADE;
 DROP VIEW IF EXISTS afterVaccine CASCADE;
-DROP VIEW IF EXISTS afterVaccineFata CASCADE;
-DROP VIEW IF EXISTS beforeVaccineFata CASCADE;
+-- DROP VIEW IF EXISTS afterVaccineFata CASCADE;
+-- DROP VIEW IF EXISTS beforeVaccineFata CASCADE;
+DROP VIEW IF EXISTS fatalityRate CASCADE;
 
 -- Since we only care about the monthly average create a view with the date information striped down
 CREATE VIEW CoronaDataMonthly AS
     SELECT iso_code, to_char(d, 'YYYY-MM') as months, total_cases, total_deaths, reproduction_rate, total_tests, stringency_index
     FROM CoronaData;
+
+CREATE VIEW CoronaDataPerMonth AS
+    SELECT DISTINCT iso_code, months,
+            max(total_cases) OVER (PARTITION BY iso_code, months) as total_cases,
+            max(total_deaths) OVER (PARTITION BY iso_code, months) as total_deaths
+    FROM CoronaDataMonthly;
 
 -- find out the earlest vaccination data start data
 CREATE VIEW vaccineStart AS
@@ -45,37 +52,44 @@ CREATE VIEW vaccineStart AS
 -- for each country before the vaccine distribution
 
 CREATE VIEW beforeVaccine AS
-    SELECT DISTINCT c.iso_code, c.months,
-            max(c.total_cases) OVER (PARTITION BY c.iso_code, c.months) as total_cases, 
-            max(c.total_deaths) OVER (PARTITION BY c.iso_code, c.months) as total_deaths
-    FROM CoronaDataMonthly c, vaccineStart v
+    SELECT DISTINCT c.iso_code, c.months, c.total_cases, c.total_deaths
+    FROM CoronaDataPerMonth c, vaccineStart v
     WHERE c.iso_code = v.iso_code and c.months < v.start_date
     ORDER BY c.iso_code, c.months;
 
 CREATE VIEW afterVaccine AS
-    SELECT DISTINCT c.iso_code, c.months,
-            max(c.total_cases) OVER (PARTITION BY c.iso_code, c.months) as total_cases, 
-            max(c.total_deaths) OVER (PARTITION BY c.iso_code, c.months) as total_deaths
-    FROM CoronaDataMonthly c, vaccineStart v
+    SELECT DISTINCT c.iso_code, c.months, c.total_cases, c.total_deaths
+    FROM CoronaDataPerMonth c, vaccineStart v
     WHERE c.iso_code = v.iso_code and c.months >= v.start_date
     ORDER BY c.iso_code, c.months;
 
-CREATE VIEW afterVaccineFata AS
+-- compute fatality_rate
+CREATE VIEW fatalityRate AS
     SELECT DISTINCT iso_code, months, cast(total_deaths as decimal)/total_cases as fatality_rate
-    FROM afterVaccine
+    FROM CoronaDataPerMonth
     ORDER BY iso_code, months;
 
-CREATE VIEW beforeVaccineFata AS
-    SELECT DISTINCT iso_code, months, cast(total_deaths as decimal)/total_cases as fatality_rate
-    FROM beforeVaccine
-    ORDER BY iso_code, months;
+-- CREATE VIEW afterVaccineFata AS
+--     SELECT DISTINCT iso_code, months, cast(total_deaths as decimal)/total_cases as fatality_rate
+--     FROM afterVaccine
+--     ORDER BY iso_code, months;
+
+-- CREATE VIEW beforeVaccineFata AS
+--     SELECT DISTINCT iso_code, months, cast(total_deaths as decimal)/total_cases as fatality_rate
+--     FROM beforeVaccine
+--     ORDER BY iso_code, months;
 
 insert into beforeVaccination
     SELECT c.iso_code, c.countryName, b.months, b.total_cases, b.total_deaths, bf.fatality_rate
-    FROM country c, beforeVaccine b, beforeVaccineFata bf
+    FROM country c, beforeVaccine b, fatalityRate bf
     WHERE c.iso_code = b.iso_code and c.iso_code = bf.iso_code and b.iso_code = bf.iso_code and b.months = bf.months;
 
 insert into afterVaccination
     SELECT c.iso_code, c.countryName, a.months, a.total_cases, a.total_deaths, af.fatality_rate
-    FROM country c, afterVaccine a, afterVaccineFata af
+    FROM country c, afterVaccine a, fatalityRate af
     WHERE c.iso_code = a.iso_code and c.iso_code = af.iso_code and a.iso_code = af.iso_code and a.months = af.months;
+
+-- follow up 
+-- first shot / population rate and the effect on the 
+-- vaccinated / population and effect
+-- fully / population and effect on fatality rate
