@@ -1,0 +1,201 @@
+Last login: Fri Dec  3 17:42:45 on ttys001
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+(base) Shuotongs-MacBook:~ Li$ ssh lishuoto@dbsrv1.teach.cs.toronto.edu
+lishuoto@dbsrv1.teach.cs.toronto.edu's password: 
+
+    Type "faq" to view FAQ, and "rules" to view usage policy.
+    Report system problems by sending email to <sysadmin@teach.cs.toronto.edu>.
+
+The Teaching Labs are: BA2200 BA2210 BA2220 BA2240 BA2270 BA3175 BA3185 BA3195 BA3200
+
+FALL 2021 Teaching Labs updates available https://www.teach.cs.toronto.edu/fall2021
+
+This is a shared Linux system. By using this system, you acknowledge that
+some information about your computer account (e.g. login name, process data,
+etc.) will be available to other users sharing this system, in ways 
+typical of shared Linux systems.  
+
+Last login: Fri Dec  3 17:43:08 2021 from 142.126.197.33
+dbsrv1:~$ #---------------Load Database---------------
+dbsrv1:~$ cd ~/CSC343_Phase2
+dbsrv1:~/CSC343_Phase2$ psql csc343h-lishuoto -f 'schema.ddl'
+psql:schema.ddl:5: NOTICE:  schema "covid19" does not exist, skipping
+DROP SCHEMA
+CREATE SCHEMA
+SET
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+dbsrv1:~/CSC343_Phase2$ psql csc343h-lishuoto -f 'load_data.sql'
+SET
+CREATE TABLE
+COPY 119672
+INSERT 0 194
+INSERT 0 103653
+INSERT 0 19111
+INSERT 0 194
+INSERT 0 194
+DROP TABLE
+dbsrv1:~/CSC343_Phase2$ #---------------Load investigation query---------------
+dbsrv1:~/CSC343_Phase2$ cd ~/CSC343_Phase2/investigation
+dbsrv1:~/CSC343_Phase2/investigation$ psql csc343h-lishuoto -f 'queries_q1.sql'
+SET
+psql:queries_q1.sql:5: NOTICE:  table "beforevaccination" does not exist, skipping
+DROP TABLE
+psql:queries_q1.sql:6: NOTICE:  table "aftervaccination" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+CREATE TABLE
+psql:queries_q1.sql:26: NOTICE:  view "coronadatamonthly" does not exist, skipping
+DROP VIEW
+psql:queries_q1.sql:27: NOTICE:  view "vaccinestart" does not exist, skipping
+DROP VIEW
+psql:queries_q1.sql:28: NOTICE:  view "beforevaccine" does not exist, skipping
+DROP VIEW
+psql:queries_q1.sql:29: NOTICE:  view "aftervaccine" does not exist, skipping
+DROP VIEW
+psql:queries_q1.sql:30: NOTICE:  view "fatalityrate" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+INSERT 0 2332
+INSERT 0 1125
+COPY 2332
+COPY 1125
+dbsrv1:~/CSC343_Phase2/investigation$ psql csc343h-lishuoto -f 'queries_q2.sql'
+SET
+psql:queries_q2.sql:9: NOTICE:  table "demographicvscorona" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+psql:queries_q2.sql:24: NOTICE:  view "deathrate" does not exist, skipping
+DROP VIEW
+psql:queries_q2.sql:25: NOTICE:  view "diagnoserate" does not exist, skipping
+DROP VIEW
+psql:queries_q2.sql:26: NOTICE:  view "finalfatalityrate" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+INSERT 0 185
+COPY 185
+dbsrv1:~/CSC343_Phase2/investigation$ psql csc343h-lishuoto -f 'queries_q3.sql'
+SET
+psql:queries_q3.sql:4: NOTICE:  view "health_info" does not exist, skipping
+DROP VIEW
+psql:queries_q3.sql:5: NOTICE:  view "covid_fatality_rate" does not exist, skipping
+DROP VIEW
+psql:queries_q3.sql:6: NOTICE:  table "healthcovidinfo" does not exist, skipping
+DROP TABLE
+CREATE VIEW
+CREATE VIEW
+SELECT 178
+COPY 178
+dbsrv1:~/CSC343_Phase2/investigation$ #---------------Start psql---------------
+dbsrv1:~/CSC343_Phase2/investigation$ psql csc343h-lishuoto
+psql (10.19 (Ubuntu 10.19-0ubuntu0.18.04.1), server 10.18 (Ubuntu 10.18-0ubuntu0.18.04.1))
+Type "help" for help.
+
+csc343h-lishuoto=> SET SEARCH_PATH to COVID19;
+SET
+csc343h-lishuoto=> \d
+                List of relations
+ Schema  |        Name         | Type  |  Owner   
+---------+---------------------+-------+----------
+ covid19 | aftervaccination    | table | lishuoto
+ covid19 | aftervaccine        | view  | lishuoto
+ covid19 | beforevaccination   | table | lishuoto
+ covid19 | beforevaccine       | view  | lishuoto
+ covid19 | coronadata          | table | lishuoto
+ covid19 | coronadatamonthly   | view  | lishuoto
+ covid19 | coronadatapermonth  | view  | lishuoto
+ covid19 | country             | table | lishuoto
+ covid19 | covid_fatality_rate | view  | lishuoto
+ covid19 | deathrate           | view  | lishuoto
+ covid19 | demographicinfo     | table | lishuoto
+ covid19 | demographicvscorona | table | lishuoto
+ covid19 | diagnoserate        | view  | lishuoto
+ covid19 | fatalityrate        | view  | lishuoto
+ covid19 | finalfatalityrate   | view  | lishuoto
+ covid19 | health_info         | view  | lishuoto
+ covid19 | healthcovidinfo     | table | lishuoto
+ covid19 | medicalinfo         | table | lishuoto
+ covid19 | vaccinations        | table | lishuoto
+ covid19 | vaccinestart        | view  | lishuoto
+(20 rows)
+
+csc343h-lishuoto=> --Tables From Phase2: Country, CoronaData, MedicalInfo, DemographicInfo, Vaccinations
+csc343h-lishuoto=> -------------------- Investigative Question 1: ------------------ 
+csc343h-lishuoto=> --Q1: Relationships between COVID-19 infections and vaccinations
+csc343h-lishuoto=> --The helper view used in this investigation: CoronaDataMonthly, vaccineStart, beforeVaccine, afterVaccine, fatalityRate
+csc343h-lishuoto=> --The result tables are: beforeVaccination,afterVaccination
+csc343h-lishuoto=> --Sample data of result tables: 
+csc343h-lishuoto=> select * from beforeVaccination where iso_code='CAN';
+ iso_code | countryname | months  | total_cases | total_deaths |     fatality_rate      
+----------+-------------+---------+-------------+--------------+------------------------
+ CAN      | Canada      | 2020-01 |           4 |              |                       
+ CAN      | Canada      | 2020-02 |          21 |              |                       
+ CAN      | Canada      | 2020-03 |        9246 |          152 | 0.01643954142331819165
+ CAN      | Canada      | 2020-04 |       56716 |         4179 | 0.07368291134776782566
+ CAN      | Canada      | 2020-05 |       92488 |         7906 | 0.08548135974396678488
+ CAN      | Canada      | 2020-06 |      106029 |         8780 | 0.08280753378792594479
+ CAN      | Canada      | 2020-07 |      118297 |         9025 | 0.07629103020363999087
+ CAN      | Canada      | 2020-08 |      130849 |         9193 | 0.07025655526599362624
+ CAN      | Canada      | 2020-09 |      162736 |         9391 | 0.05770696096745649395
+ CAN      | Canada      | 2020-10 |      238191 |        10276 | 0.04314184834859419541
+ CAN      | Canada      | 2020-11 |      382708 |        12239 | 0.03197999519215694472
+ CAN      | Canada      | 2020-12 |      587429 |        15762 | 0.02683217886757378338
+(12 rows)
+
+csc343h-lishuoto=> select * from afterVaccination where iso_code='CAN';
+ iso_code | countryname | months  | total_cases | total_deaths |     fatality_rate      
+----------+-------------+---------+-------------+--------------+------------------------
+ CAN      | Canada      | 2021-01 |      783735 |        20041 | 0.02557114330736792411
+ CAN      | Canada      | 2021-02 |      871243 |        21995 | 0.02524553999286077478
+ CAN      | Canada      | 2021-03 |      989493 |        22960 | 0.02320380235130516335
+ CAN      | Canada      | 2021-04 |     1229305 |        24220 | 0.01970218944850952367
+ CAN      | Canada      | 2021-05 |     1389814 |        25548 | 0.01838231590702065168
+ CAN      | Canada      | 2021-06 |     1423170 |        26296 | 0.01847706177055446644
+ CAN      | Canada      | 2021-07 |     1438457 |        26599 | 0.01849134176412642158
+ CAN      | Canada      | 2021-08 |     1507092 |        26989 | 0.01790799765375969085
+ CAN      | Canada      | 2021-09 |     1620537 |        27751 | 0.01712457043560251941
+(9 rows)
+
+csc343h-lishuoto=> -------------------- Investigative Question 2: ------------------ 
+csc343h-lishuoto=> --Q2: Relationships between GDP, HDI level, COVID-19 death and hospitalization rate
+csc343h-lishuoto=> --The helper view used in this investigation: deathrate, diagnoserate, finalFatalityRate
+csc343h-lishuoto=> --The result tables is: demographicVScorona
+csc343h-lishuoto=> --Sample data of result tables: 
+csc343h-lishuoto=> select * from demographicVScorona where iso_code='CAN' or iso_code='USA' or iso_code='MEX';
+ iso_code |  countryname  | gdp_per_capita | population |      deaths_rate       |     diagnosed_rate     |     fatality_rate      | human_development_index | aged_65_older | population_density 
+----------+---------------+----------------+------------+------------------------+------------------------+------------------------+-------------------------+---------------+--------------------
+ CAN      | Canada        |      44017.591 |   38067913 | 0.00072898664027103351 | 0.04256963075438361961 | 0.01712457043560251941 |                   0.929 |        16.984 |              4.037
+ MEX      | Mexico        |      17336.469 |  130262220 | 0.00211631584353467951 | 0.02791144661898131323 | 0.07582250653018710839 |                   0.779 |         6.857 |             66.444
+ USA      | United States |      54225.446 |  332915074 | 0.00207388025932403409 | 0.12951183460079671850 | 0.01601305599381321863 |                   0.926 |        15.413 |             35.608
+(3 rows)
+
+csc343h-lishuoto=> -------------------- Investigative Question 3: ------------------
+csc343h-lishuoto=> --Q3: Relationships between Smoking rate, cardiovascular death rate, diabetes prevalance and COVID-19 death rate
+csc343h-lishuoto=> --The helper view used in this investigation: health_info, COVID_fatality_rate
+csc343h-lishuoto=> --The result tables is: HealthCOVIDInfo
+csc343h-lishuoto=> --Sample data of result tables: 
+csc343h-lishuoto=> select * from HealthCOVIDInfo where iso_code='CAN' or iso_code='USA' or iso_code='MEX';
+ iso_code |  countryname  | gdp_per_capita | cardiovasc_death_rate | diabetes_prevalence | smoking_rate | covid_fatality_rate 
+----------+---------------+----------------+-----------------------+---------------------+--------------+---------------------
+ USA      | United States |      54225.446 |               151.089 |               10.79 |        21.85 |             1.60131
+ CAN      | Canada        |      44017.591 |               105.599 |                7.37 |         14.3 |             1.71246
+ MEX      | Mexico        |      17336.469 |               152.783 |               13.06 |        14.15 |             7.58225
+(3 rows)
+
+csc343h-lishuoto=> ----------PSQL demo end----------
+csc343h-lishuoto=> ^Z
+[1]+  Stopped                 psql csc343h-lishuoto
+dbsrv1:~/CSC343_Phase2/investigation$ #END of demo-queries.txt

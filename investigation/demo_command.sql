@@ -11,16 +11,16 @@ ssh lishuoto@dbsrv1.teach.cs.toronto.edu
 psql csc343h-lishuoto
 DROP SCHEMA if exists COVID19 CASCADE;
 
-#Load Database
+#---------------Load Database---------------
 cd ~/CSC343_Phase2
 psql csc343h-lishuoto -f 'schema.ddl'
 psql csc343h-lishuoto -f 'load_data.sql'
-#Load investigation query
+#---------------Load investigation query---------------
 cd ~/CSC343_Phase2/investigation
 psql csc343h-lishuoto -f 'queries_q1.sql'
 psql csc343h-lishuoto -f 'queries_q2.sql'
 psql csc343h-lishuoto -f 'queries_q3.sql'
-#Start psql
+#---------------Start psql---------------
 psql csc343h-lishuoto
 --SQL Commend below
 SET SEARCH_PATH to COVID19;
@@ -31,14 +31,14 @@ SET SEARCH_PATH to COVID19;
 --The helper view used in this investigation: CoronaDataMonthly, vaccineStart, beforeVaccine, afterVaccine, fatalityRate
 --The result tables are: beforeVaccination,afterVaccination
 --Sample data of result tables: 
-select * from beforeVaccination where iso_code='CAN' or iso_code='USA' or iso_code='MEX';
-select * from afterVaccination where iso_code='CAN' or iso_code='USA' or iso_code='MEX';
+select * from beforeVaccination where iso_code='CAN';
+select * from afterVaccination where iso_code='CAN';
 -------------------- Investigative Question 2: ------------------ 
 --Q2: Relationships between GDP, HDI level, COVID-19 death and hospitalization rate
 --The helper view used in this investigation: deathrate, diagnoserate, finalFatalityRate
 --The result tables is: demographicVScorona
 --Sample data of result tables: 
-select * from demographicVScoronawhere iso_code='CAN' or iso_code='USA' or iso_code='MEX';
+select * from demographicVScorona where iso_code='CAN' or iso_code='USA' or iso_code='MEX';
 -------------------- Investigative Question 3: ------------------
 --Q3: Relationships between Smoking rate, cardiovascular death rate, diabetes prevalance and COVID-19 death rate
 --The helper view used in this investigation: health_info, COVID_fatality_rate
